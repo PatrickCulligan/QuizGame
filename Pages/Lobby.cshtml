@@ -1,0 +1,30 @@
+@page
+@model QuizGame.Pages.LobbyModel
+@{
+    ViewData["Title"] = "Lobby";
+    Layout = "_PlayerLayout";
+}
+@if (Model.Session is null || Model.Player is null)
+{
+    <div class="alert alert-warning">Session not found.</div>
+}
+else
+{
+    <div class="text-center">
+        <div class="display-6 mb-2">Waiting for host…</div>
+        <div class="mb-3">Game PIN: <strong>@Model.Session.Pin</strong></div>
+        <div class="mb-4">You joined as <strong>@Model.Player.Username</strong></div>
+        <div class="spinner-border text-primary" role="status"></div>
+    </div>
+}
+@section Scripts {
+<script>
+const sessionId = "@(Model.Session?.Id.ToString() ?? "")";
+const playerId = "@(Model.Player?.Id.ToString() ?? "")";
+if (sessionId && playerId) {
+    const connection = new signalR.HubConnectionBuilder().withUrl("/gamehub").build();
+    connection.on("SessionUpdated", () => location.reload());
+    connection.start().then(() => connection.invoke("JoinSessionGroup", sessionId));
+}
+</script>
+}

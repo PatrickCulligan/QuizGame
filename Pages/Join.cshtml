@@ -1,0 +1,21 @@
+@page
+@model QuizGame.Pages.JoinModel
+@{
+    ViewData["Title"] = "Join";
+    Layout = "_PlayerLayout";
+  
+}
+<div class="join-shell">
+    <div class="card shadow-lg p-4 join-card">
+        <h2 class="text-center mb-4">Join Game</h2>
+        @if (!string.IsNullOrWhiteSpace(Model.Message))
+        {
+            <div class="alert alert-warning">@Model.Message</div>
+        }
+        <form method="post">
+            <div class="mb-3"><label asp-for="Pin" class="form-label"></label><input asp-for="Pin" class="form-control form-control-lg text-center" /></div>
+            <div class="mb-3"><label asp-for="Username" class="form-label"></label><input asp-for="Username" class="form-control form-control-lg text-center" /></div>
+            <button type="submit" class="btn btn-success w-100 btn-lg">Join</button>
+        </form>
+    </div>
+</div>

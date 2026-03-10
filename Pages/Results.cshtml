@@ -1,0 +1,50 @@
+@page
+@model QuizGame.Pages.ResultsModel
+@{
+    ViewData["Title"] = "Results";
+    Layout = "_PlayerLayout";
+}
+@if (Model.Session is null)
+{
+    <div class="alert alert-warning">No results found.</div>
+}
+else
+{
+    <div class="text-center mb-4">
+        <h1 class="fw-bold">Final Leaderboard</h1>
+        <div class="text-muted">PIN @Model.Session.Pin</div>
+    </div>
+
+    @if (Model.Rows.Any())
+    {
+        <div class="row g-3 mb-4">
+            @for (var i = 0; i < Math.Min(3, Model.Rows.Count); i++)
+            {
+                var row = Model.Rows[i];
+                <div class="col-md-4">
+                    <div class="podium-card rank-@(i + 1)">
+                        <div class="small text-uppercase">#@(i + 1)</div>
+                        <div class="h3 mb-1">@row.Username</div>
+                        <div>@row.Score pts</div>
+                        <div class="text-muted">@row.CorrectAnswers correct</div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead><tr><th>Rank</th><th>Player</th><th>Score</th><th>Correct</th><th>Total Time</th></tr></thead>
+            <tbody>
+            @for (var i = 0; i < Model.Rows.Count; i++)
+            {
+                var row = Model.Rows[i];
+                <tr>
+                    <td>@(i + 1)</td><td>@row.Username</td><td>@row.Score</td><td>@row.CorrectAnswers</td><td>@row.TotalResponseSeconds.ToString("0.0")s</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}

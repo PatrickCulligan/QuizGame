@@ -1,0 +1,14 @@
+@page
+@model QuizGame.Pages.IndexModel
+@{
+    ViewData["Title"] = "Home";
+}
+<div class="hero-card p-5 text-center">
+    <h1 class="display-4 fw-bold mb-3">The Real Quiz Game</h1>
+    <p class="lead mb-4">Host a live quiz, share a PIN, let players join on their phones, and show a live leaderboard at the end.</p>
+    <div class="d-flex justify-content-center flex-wrap gap-3">
+        <a asp-page="/Admin" class="btn btn-primary btn-lg px-4">Create Quiz</a>
+        <a asp-page="/Host" class="btn btn-dark btn-lg px-4">Host Screen</a>
+        <a asp-page="/Join" class="btn btn-success btn-lg px-4">Join Game</a>
+    </div>
+</div>

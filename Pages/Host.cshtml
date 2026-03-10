@@ -1,0 +1,82 @@
+@page
+@model QuizGame.Pages.HostModel
+@{
+    ViewData["Title"] = "Host";
+}
+@if (Model.Session is null || Model.Quiz is null)
+{
+    <div class="alert alert-warning">No session selected. Go to Admin and create a live game session first.</div>
+}
+else
+{
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="host-stage p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="mb-0">@Model.Quiz.Title</h2>
+                    <div class="pin-box">PIN @Model.Session.Pin</div>
+                </div>
+
+                @if (Model.Session.Status == SessionStatus.Lobby)
+                {
+                    <div class="display-5 fw-bold mb-3">Lobby</div>
+                    <p class="lead">Players can join now.</p>
+                    <form method="post" asp-page-handler="StartQuestion">
+                        <input type="hidden" asp-for="SessionId" />
+                        <button type="submit" class="btn btn-success btn-lg">Start Game</button>
+                    </form>
+                }
+                else if (Model.CurrentQuestion is not null)
+                {
+                    <div class="text-uppercase text-muted mb-2">Question @Model.Session.CurrentQuestionIndex of @Model.Quiz.QuestionCount</div>
+                    <h1 class="mb-4">@Model.CurrentQuestion.Text</h1>
+                    <div class="row g-3">
+                        <div class="col-md-6"><div class="answer-card a">@Model.CurrentQuestion.OptionA</div></div>
+                        <div class="col-md-6"><div class="answer-card b">@Model.CurrentQuestion.OptionB</div></div>
+                        <div class="col-md-6"><div class="answer-card c">@Model.CurrentQuestion.OptionC</div></div>
+                        <div class="col-md-6"><div class="answer-card d">@Model.CurrentQuestion.OptionD</div></div>
+                    </div>
+
+                    @if (Model.Session.Status == SessionStatus.QuestionLive)
+                    {
+                        <div class="mt-4"><form method="post" asp-page-handler="CloseQuestion"><input type="hidden" asp-for="SessionId" /><button type="submit" class="btn btn-warning">Close Question</button></form></div>
+                    }
+                    else if (Model.Session.Status == SessionStatus.QuestionClosed)
+                    {
+                        <div class="alert alert-info mt-4">Correct answer: <strong>@Model.CurrentQuestion.CorrectAnswer</strong></div>
+                        @if (Model.Session.CurrentQuestionIndex < Model.Quiz.QuestionCount)
+                        {
+                            <form method="post" asp-page-handler="StartQuestion"><input type="hidden" asp-for="SessionId" /><button type="submit" class="btn btn-primary">Next Question</button></form>
+                        }
+                        else
+                        {
+                            <form method="post" asp-page-handler="Finish"><input type="hidden" asp-for="SessionId" /><button type="submit" class="btn btn-success">Finish Game</button></form>
+                        }
+                    }
+                }
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-sm"><div class="card-body">
+                <h4>Players (@Model.Players.Count)</h4>
+                <ul class="list-group list-group-flush">
+                    @foreach (var player in Model.Players)
+                    {
+                        <li class="list-group-item">@player.Username</li>
+                    }
+                </ul>
+            </div></div>
+        </div>
+    </div>
+}
+@section Scripts {
+<script>
+const sessionId = "@(Model.Session?.Id.ToString() ?? "")";
+if (sessionId) {
+    const connection = new signalR.HubConnectionBuilder().withUrl("/gamehub").build();
+    connection.on("PlayersUpdated", () => location.reload());
+    connection.on("SessionUpdated", () => location.reload());
+    connection.start().then(() => connection.invoke("JoinSessionGroup", sessionId));
+}
+</script>
+}

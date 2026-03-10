@@ -1,0 +1,52 @@
+@page
+@model QuizGame.Pages.AdminModel
+@{
+    ViewData["Title"] = "Admin";
+}
+<h2 class="mb-4">Admin</h2>
+
+@if (!string.IsNullOrWhiteSpace(Model.Message))
+{
+    <div class="alert alert-info">@Model.Message</div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <form method="post" asp-page-handler="Generate" class="card card-body shadow-sm">
+            <div class="mb-3"><label asp-for="Input.Title" class="form-label"></label><input asp-for="Input.Title" class="form-control" /></div>
+            <div class="mb-3"><label asp-for="Input.Topic" class="form-label"></label><input asp-for="Input.Topic" class="form-control" /></div>
+            <div class="mb-3">
+                <label asp-for="Input.Difficulty" class="form-label"></label>
+                <select asp-for="Input.Difficulty" class="form-select"><option>Easy</option><option>Medium</option><option>Hard</option></select>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3"><label asp-for="Input.QuestionCount" class="form-label"></label><input asp-for="Input.QuestionCount" class="form-control" /></div>
+                <div class="col-md-6 mb-3"><label asp-for="Input.SecondsPerQuestion" class="form-label"></label><input asp-for="Input.SecondsPerQuestion" class="form-control" /></div>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Quiz With AI</button>
+        </form>
+    </div>
+
+    <div class="col-lg-6">
+        @if (Model.CurrentQuiz is not null)
+        {
+            <div class="card shadow-sm"><div class="card-body">
+                <h4 class="mb-3">@Model.CurrentQuiz.Title</h4>
+                <div><strong>Topic:</strong> @Model.CurrentQuiz.Topic</div>
+                <div><strong>Difficulty:</strong> @Model.CurrentQuiz.Difficulty</div>
+                <div><strong>Questions:</strong> @Model.CurrentQuiz.QuestionCount</div>
+                <div><strong>Seconds / question:</strong> @Model.CurrentQuiz.SecondsPerQuestion</div>
+                <form method="post" asp-page-handler="CreateSession" class="mt-4">
+                    <button type="submit" class="btn btn-success">Create Live Game Session</button>
+                </form>
+                @if (Model.SessionPin is not null && Model.SessionId is not null)
+                {
+                    <div class="alert alert-success mt-4">
+                        Session created. PIN: <strong>@Model.SessionPin</strong><br />
+                        <a asp-page="/Host" asp-route-sessionId="@Model.SessionId" class="btn btn-dark mt-2">Open Host Screen</a>
+                    </div>
+                }
+            </div></div>
+        }
+    </div>
+</div>

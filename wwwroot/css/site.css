@@ -1,0 +1,16 @@
+body { background: linear-gradient(135deg, #f6f3ff 0%, #eef7ff 100%); }
+.hero-card, .host-stage, .join-card, .podium-card { background: white; border-radius: 24px; box-shadow: 0 12px 40px rgba(31, 41, 55, 0.08); }
+.pin-box { font-size: 1.25rem; font-weight: 700; background: #111827; color: white; padding: 0.7rem 1rem; border-radius: 999px; }
+.answer-card, .btn-answer { color: white !important; border: 0 !important; font-weight: 700 !important; border-radius: 18px !important; min-height: 88px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 1rem; font-size: 1.1rem; }
+.answer-card.a, .btn-answer.a { background: #e11d48; }
+.answer-card.b, .btn-answer.b { background: #2563eb; }
+.answer-card.c, .btn-answer.c { background: #d97706; }
+.answer-card.d, .btn-answer.d { background: #16a34a; }
+.join-shell { min-height: 70vh; display: flex; align-items: center; justify-content: center; }
+.join-card { width: 100%; max-width: 460px; }
+.timer-circle { width: 110px; height: 110px; border-radius: 999px; background: #111827; color: white; display: grid; place-items: center; font-size: 2rem; font-weight: 700; }
+.podium-card { padding: 1.5rem; text-align: center; }
+.podium-card.rank-1 { border-top: 8px solid gold; }
+.podium-card.rank-2 { border-top: 8px solid silver; }
+.podium-card.rank-3 { border-top: 8px solid #cd7f32; }
+.card, .btn, .form-control, .form-select { border-radius: 16px !important; }
