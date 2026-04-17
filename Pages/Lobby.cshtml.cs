@@ -19,10 +19,18 @@ public class LobbyModel : PageModel
     public async Task<IActionResult> OnGetAsync()
     {
         Session = await _db.GameSessions.FirstOrDefaultAsync(x => x.Id == SessionId);
-        Player = await _db.Players.FirstOrDefaultAsync(x => x.Id == PlayerId);
+        Player = await _db.Players.FirstOrDefaultAsync(x => x.Id == PlayerId && x.GameSessionId == SessionId);
+
+        if (Session is null || Player is null)
+            return RedirectToPage("/Join");
 
         if (Session?.Status == SessionStatus.QuestionLive || Session?.Status == SessionStatus.QuestionClosed)
+        {
+            if (!Player.IsAdmitted)
+                return Page();
+
             return RedirectToPage("/Play", new { sessionId = SessionId, playerId = PlayerId });
+        }
 
         if (Session?.Status == SessionStatus.Finished)
             return RedirectToPage("/Results", new { sessionId = SessionId, playerId = PlayerId });

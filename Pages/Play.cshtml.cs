@@ -31,6 +31,12 @@ public class PlayModel : PageModel
     public async Task<IActionResult> OnGetAsync()
     {
         await LoadAsync();
+        if (Session is null || Player is null)
+            return RedirectToPage("/Join");
+
+        if (!Player.IsAdmitted)
+            return RedirectToPage("/Lobby", new { sessionId = SessionId, playerId = PlayerId });
+
         if (Session?.Status == SessionStatus.Finished)
             return RedirectToPage("/Results", new { sessionId = SessionId, playerId = PlayerId });
         return Page();
@@ -51,7 +57,7 @@ public class PlayModel : PageModel
     private async Task LoadAsync()
     {
         Session = await _db.GameSessions.Include(s => s.Quiz).FirstOrDefaultAsync(s => s.Id == SessionId);
-        Player = await _db.Players.FirstOrDefaultAsync(p => p.Id == PlayerId);
+        Player = await _db.Players.FirstOrDefaultAsync(p => p.Id == PlayerId && p.GameSessionId == SessionId);
         if (Session is null || Player is null) return;
 
         Question = await _gameService.GetCurrentQuestionAsync(Session.Id);

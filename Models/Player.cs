@@ -11,4 +11,7 @@ public class Player
     public string Username { get; set; } = string.Empty;
 
     public DateTime JoinedAtUtc { get; set; } = DateTime.UtcNow;
+
+    // New: player must be admitted by host before being considered "in" the game
+    public bool IsAdmitted { get; set; } = false;
 }

@@ -11,10 +11,20 @@
 else
 {
     <div class="text-center">
-        <div class="display-6 mb-2">Waiting for host…</div>
-        <div class="mb-3">Game PIN: <strong>@Model.Session.Pin</strong></div>
-        <div class="mb-4">You joined as <strong>@Model.Player.Username</strong></div>
-        <div class="spinner-border text-primary" role="status"></div>
+        @if (!Model.Player.IsAdmitted)
+        {
+            <div class="display-6 mb-2">Waiting for host to admit you…</div>
+            <div class="mb-3">Game PIN: <strong>@Model.Session.Pin</strong></div>
+            <div class="mb-4">You joined as <strong>@Model.Player.Username</strong></div>
+            <div class="spinner-border text-primary" role="status"></div>
+        }
+        else
+        {
+            <div class="display-6 mb-2">You have been admitted. Waiting for the host to start the game…</div>
+            <div class="mb-3">Game PIN: <strong>@Model.Session.Pin</strong></div>
+            <div class="mb-4">You joined as <strong>@Model.Player.Username</strong></div>
+            <div class="spinner-border text-primary" role="status"></div>
+        }
     </div>
 }
 @section Scripts {
@@ -23,6 +33,7 @@ const sessionId = "@(Model.Session?.Id.ToString() ?? "")";
 const playerId = "@(Model.Player?.Id.ToString() ?? "")";
 if (sessionId && playerId) {
     const connection = new signalR.HubConnectionBuilder().withUrl("/gamehub").build();
+    connection.on("PlayersUpdated", () => location.reload());
     connection.on("SessionUpdated", () => location.reload());
     connection.start().then(() => connection.invoke("JoinSessionGroup", sessionId));
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ using QuizGame.Services;
 
 namespace QuizGame.Pages;
 
+[Authorize(Roles = "Admin")]
 public class AdminModel : PageModel
 {
     private readonly AppDbContext _db;
@@ -35,6 +37,10 @@ public class AdminModel : PageModel
     {
         if (!ModelState.IsValid) { await LoadAsync(); return Page(); }
 
+        var generatedQuestions = await _openAiQuizService.GenerateQuestionsAsync(Input.QuestionCount, Input.Topic, Input.Difficulty);
+
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+
         _db.PlayerAnswers.RemoveRange(_db.PlayerAnswers);
         _db.Players.RemoveRange(_db.Players);
         _db.GameSessions.RemoveRange(_db.GameSessions);
@@ -42,7 +48,6 @@ public class AdminModel : PageModel
         _db.Quizzes.RemoveRange(_db.Quizzes);
         await _db.SaveChangesAsync();
 
-        var generatedQuestions = await _openAiQuizService.GenerateQuestionsAsync(Input.QuestionCount, Input.Topic, Input.Difficulty);
         var quiz = new Quiz
         {
             Title = Input.Title,
@@ -56,6 +61,7 @@ public class AdminModel : PageModel
 
         _db.Quizzes.Add(quiz);
         await _db.SaveChangesAsync();
+        await transaction.CommitAsync();
 
         Message = "Quiz generated successfully.";
         await LoadAsync();

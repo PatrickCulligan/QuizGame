@@ -10,7 +10,7 @@ public class LeaderboardService
 
     public async Task<List<LeaderboardRow>> GetLeaderboardAsync(int sessionId)
     {
-        var players = await _db.Players.Where(p => p.GameSessionId == sessionId).ToListAsync();
+        var players = await _db.Players.Where(p => p.GameSessionId == sessionId && p.IsAdmitted).ToListAsync();
         var answers = await _db.PlayerAnswers.Where(a => a.GameSessionId == sessionId).ToListAsync();
 
         return players.Select(p => new LeaderboardRow

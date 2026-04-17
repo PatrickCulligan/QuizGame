@@ -62,7 +62,29 @@ else
                 <ul class="list-group list-group-flush">
                     @foreach (var player in Model.Players)
                     {
-                        <li class="list-group-item">@player.Username</li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                @player.Username
+                                @if (player.IsAdmitted)
+                                {
+                                    <span class="badge bg-success ms-2">Admitted</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary ms-2">Waiting</span>
+                                }
+                            </div>
+                            <div>
+                                @if (!player.IsAdmitted)
+                                {
+                                    <form method="post" asp-page-handler="Admit" class="d-inline">
+                                        <input type="hidden" name="playerId" value="@player.Id" />
+                                        <input type="hidden" name="SessionId" value="@Model.Session.Id" />
+                                        <button type="submit" class="btn btn-sm btn-primary">Admit</button>
+                                    </form>
+                                }
+                            </div>
+                        </li>
                     }
                 </ul>
             </div></div>

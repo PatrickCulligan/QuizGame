@@ -7,11 +7,32 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>.</DockerfileContext>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="QuizGame.Tests\**\*.cs" />
+    <Content Remove="QuizGame.Tests\**" />
+    <EmbeddedResource Remove="QuizGame.Tests\**" />
+    <None Remove="QuizGame.Tests\**" />
+    <Compile Remove="SqliteFixTemp\**\*.cs" />
+    <Content Remove="SqliteFixTemp\**" />
+    <EmbeddedResource Remove="SqliteFixTemp\**" />
+    <None Remove="SqliteFixTemp\**" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+
+    <!-- Production-ready logging -->
+    <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
+
+    <!-- Postgres provider (compile-time dependency for UseNpgsql) -->
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
+
+    <!-- Visual Studio Docker tooling -->
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
   </ItemGroup>
 </Project>

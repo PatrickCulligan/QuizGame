@@ -54,7 +54,8 @@ public class GameService
         var player = await _db.Players.FirstOrDefaultAsync(p => p.GameSessionId == session.Id && p.Username == trimmed);
         if (player is null)
         {
-            player = new Player { GameSessionId = session.Id, Username = trimmed, JoinedAtUtc = DateTime.UtcNow };
+            // new players are not admitted by default
+            player = new Player { GameSessionId = session.Id, Username = trimmed, JoinedAtUtc = DateTime.UtcNow, IsAdmitted = false };
             _db.Players.Add(player);
             await _db.SaveChangesAsync();
         }
@@ -65,6 +66,12 @@ public class GameService
     public async Task SubmitAnswerAsync(int sessionId, int playerId, string selectedAnswer)
     {
         var session = await _db.GameSessions.Include(s => s.Quiz).FirstAsync(s => s.Id == sessionId);
+        var player = await _db.Players.FirstOrDefaultAsync(p => p.Id == playerId && p.GameSessionId == sessionId);
+        if (player is null || !player.IsAdmitted) return;
+
+        if (session.Status != SessionStatus.QuestionLive) return;
+        if (session.QuestionEndsAtUtc.HasValue && DateTime.UtcNow > session.QuestionEndsAtUtc.Value) return;
+
         var question = await _db.Questions.FirstAsync(q => q.QuizId == session.QuizId && q.OrderIndex == session.CurrentQuestionIndex);
 
         var exists = await _db.PlayerAnswers.AnyAsync(a => a.PlayerId == playerId && a.QuestionId == question.Id);
