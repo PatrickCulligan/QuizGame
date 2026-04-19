@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: quizgame-local
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quizgame
+  namespace: quizgame-local
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quizgame
+  template:
+    metadata:
+      labels:
+        app: quizgame
+    spec:
+      containers:
+        - name: quizgame
+          image: quizgame:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            # Keep the SQLite file on a writable pod volume for local Kubernetes runs.
+            - name: app-data
+              mountPath: /app/data
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 20
+      volumes:
+        - name: app-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quizgame
+  namespace: quizgame-local
+spec:
+  selector:
+    app: quizgame
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      nodePort: 30080
+  type: NodePort

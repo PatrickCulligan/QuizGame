@@ -78,6 +78,25 @@ if (args.Contains("--migrate", StringComparer.OrdinalIgnoreCase))
     }
 }
 
+// For local Docker and SQLite-based runs, make normal startup self-initializing.
+// Postgres environments should keep using the explicit migration step.
+if (!string.IsNullOrWhiteSpace(conn) && !conn.Contains("Host=", StringComparison.OrdinalIgnoreCase))
+{
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        var dbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
+        using var db = dbFactory.CreateDbContext();
+        db.Database.Migrate();
+        Log.Information("SQLite migrations applied during app startup.");
+    }
+    catch (Exception ex)
+    {
+        Log.Fatal(ex, "Failed to apply SQLite migrations during app startup.");
+        throw;
+    }
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();

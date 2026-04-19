@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quizgame
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quizgame
+  template:
+    metadata:
+      labels:
+        app: quizgame
+    spec:
+      containers:
+        - name: quizgame
+          image: pjculligan/quizgame:1.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          # Keep a writable path for the SQLite file if the container starts without external storage.
+          volumeMounts:
+            - name: app-data
+              mountPath: /app/data
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 20
+      volumes:
+        - name: app-data
+          emptyDir: {}
